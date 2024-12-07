@@ -2,7 +2,6 @@
 
 Sistema de arquivo FAT16 para disciplina de Sistemas Operacionais.
 
-Atualizado por Larissa de Souza, Paulo Hermans e Vinícius Schütz Piva.
 
 # Instruções de Compilação
 
