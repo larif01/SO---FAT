@@ -1,47 +1,45 @@
 #include "support.h"
 #include <stdio.h>
 #include <string.h>
-
-
 #include <ctype.h>
-
 #include <stdbool.h>
-#include "fat16.h"
+#include "fat32.h"  // Alterado para incluir o cabeçalho FAT32
 
-
-/* Manipulate the path to lead com name, extensions and special characters */
-bool cstr_to_fat16wnull(char *filename, char output[FAT16STR_SIZE_WNULL])
+/* Manipulate the path to lead with name, extensions and special characters */
+bool cstr_to_fat32wnull(char *filename, char output[FAT32STR_SIZE_WNULL])
 {
+    // Clear the output buffer
+    memset(output, 0, FAT32STR_SIZE_WNULL);
 
+    // Split the filename into name and extension
+    char *dot = strrchr(filename, '.');
+    size_t name_len = dot ? (size_t)(dot - filename) : strlen(filename);
+    size_t ext_len = dot ? strlen(dot + 1) : 0;
 
-	char* strptr = filename;
-	char* dot;
-	dot = strchr(filename, '.');
+    // Copy the name part
+    for (size_t i = 0; i < name_len && i < 8; i++) {
+        output[i] = toupper(filename[i]);
+    }
 
-	if (dot == NULL) return true;
+    // Pad with spaces if the name is less than 8 characters
+    for (size_t i = name_len; i < 8; i++) {
+        output[i] = ' ';
+    }
 
-	int i;
-	for(i=0; strptr != dot; strptr++, i++){
-		if(i==8)
-			break;
-		output[i] = *strptr;
-	}
+    // Copy the extension part
+    if (dot) {
+        for (size_t i = 0; i < ext_len && i < 3; i++) {
+            output[8 + i] = toupper(dot[1 + i]);
+        }
+    }
 
-	int trail = 8 - i;
-	for(; trail > 0; trail--, i++){
-		output[i] = ' ';
-	}
+    // Pad with spaces if the extension is less than 3 characters
+    for (size_t i = ext_len; i < 3; i++) {
+        output[8 + i] = ' ';
+    }
 
-	strptr = dot;
-	strptr++;
-	for(i=8; i < 11; strptr++, i++){
-		output[i] = *strptr;
-	}
+    // Null-terminate the output
+    output[11] = '\0';
 
-	output[11] = '\0';
-	for(i = 0; output[i] != '\0'; i++){
-		output[i] = toupper(output[i]);
-	}
-
-	return false;
+    return false;
 }
