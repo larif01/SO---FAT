@@ -2,7 +2,7 @@
 #define COMMANDS_H
 
 #include <stdbool.h>
-#include "fat16.h"
+#include "fat32.h" // Inclua o cabeçalho do FAT32
 
 /*
  * Esta struct encapsula o resultado de find(), carregando informações sobre a
@@ -10,25 +10,22 @@
  */
 struct far_dir_searchres
 {
-	struct fat_dir fdir; // Diretório encontrado
-	bool          found; // Encontrou algo?
-	int             idx; // Index relativo ao diretório de busca
+    struct fat_dir fdir; // Diretório encontrado
+    bool          found;  // Encontrou algo?
+    int           idx;    // Index relativo ao diretório de busca
 };
 
 /*
- * Esta struct encapsula o resultado de fat16_find_free_cluster()
- *
+ * Esta struct encapsula o resultado de fat32_find_free_cluster()
  */
-struct fat16_newcluster_info
+struct fat32_newcluster_info
 {
-	uint16_t cluster;
-	uint32_t address;
+    uint32_t cluster;     // Usar uint32_t para clusters no FAT32
+    uint32_t address;     // Endereço do cluster
 };
-
 
 /* list files in fat_bpb */
 struct fat_dir *ls(FILE *, struct fat_bpb *);
-
 
 /* move um arquivo da fonte ao destino */
 void mv(FILE* fp, char* source, char* dest, struct fat_bpb* bpb);
@@ -48,13 +45,15 @@ void cat(FILE* fp, char* filename, struct fat_bpb* bpb);
 struct far_dir_searchres find_in_root(struct fat_dir *dirs, char *filename, struct fat_bpb *bpb);
 
 /* Procura cluster vazio */
-struct fat16_newcluster_info fat16_find_free_cluster(FILE* fp, struct fat_bpb* bpb);
+struct fat32_newcluster_info fat32_find_free_cluster(FILE* fp, struct fat_bpb* bpb);
 
+/* Macro para encontrar o menor valor */
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
-///
-
-/* int write_dir (FILE *, char *, struct fat_dir *); */
-/* int write_data(FILE *, char *, struct fat_dir *, struct fat_bpb *); */
+/* 
+ * Funções adicionais que podem ser necessárias para o FAT32
+ * int write_dir (FILE *, char *, struct fat_dir *); 
+ * int write_data(FILE *, char *, struct fat_dir *, struct fat_bpb *);
+ */
 
 #endif
